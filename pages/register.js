@@ -1,7 +1,7 @@
-/* /pages/login.js */
+/* /pages/register.js */
 
-import React, { useState, useEffect, useContext } from "react";
-import { useRouter } from "next/router";
+import React, { useState, useContext } from "react";
+
 import {
   Container,
   Row,
@@ -12,36 +12,21 @@ import {
   Label,
   Input,
 } from "reactstrap";
-import { login } from "../components/auth";
+import { registerUser } from "../components/auth";
 import AppContext from "../components/context";
-// import {MyApp} from "./_app";
 
-function Login(props) {
-  const [data, updateData] = useState({ identifier: "", password: "" });
+const Register = () => {
+  const [data, setData] = useState({ email: "", username: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const router = useRouter();
-  // const appContext = useContext(MyApp);
+  const [error, setError] = useState({});
   const appContext = useContext(AppContext);
-  // const {user, setUser, isAuthenticated} = useContext(AppContext);
-  
-  useEffect(() => {
-    if (appContext.isAuthenticated) {
-      router.push("/"); // redirect if you're already logged in
-    }
-  }, []);
-
-  function onChange(event) {
-    updateData({ ...data, [event.target.name]: event.target.value });
-  }
-
   return (
     <Container>
       <Row>
         <Col sm="12" md={{ size: 5, offset: 3 }}>
           <div className="paper">
             <div className="header">
-              <img src="http://localhost:1337/uploads/75d0162b3b3e437aaa8953ca56a0d1dc.jpg" />
+              <img src="http://localhost:1337/uploads/34d160de396c4fea8ede1f17b353ca41.jpg" />
             </div>
             <section className="wrapper">
               {Object.entries(error).length !== 0 &&
@@ -61,23 +46,42 @@ function Login(props) {
               <Form>
                 <fieldset disabled={loading}>
                   <FormGroup>
+                    <Label>Username:</Label>
+                    <Input
+                      disabled={loading}
+                      onChange={(e) =>
+                        setData({ ...data, username: e.target.value })
+                      }
+                      value={data.username}
+                      type="text"
+                      name="username"
+                      style={{ height: 50, fontSize: "1.2em" }}
+                    />
+                  </FormGroup>
+                  <FormGroup>
                     <Label>Email:</Label>
                     <Input
-                      onChange={(event) => onChange(event)}
-                      name="identifier"
+                      onChange={(e) =>
+                        setData({ ...data, email: e.target.value })
+                      }
+                      value={data.email}
+                      type="email"
+                      name="email"
                       style={{ height: 50, fontSize: "1.2em" }}
                     />
                   </FormGroup>
                   <FormGroup style={{ marginBottom: 30 }}>
                     <Label>Password:</Label>
                     <Input
-                      onChange={(event) => onChange(event)}
+                      onChange={(e) =>
+                        setData({ ...data, password: e.target.value })
+                      }
+                      value={data.password}
                       type="password"
                       name="password"
                       style={{ height: 50, fontSize: "1.2em" }}
                     />
                   </FormGroup>
-
                   <FormGroup>
                     <span>
                       <a href="">
@@ -87,27 +91,24 @@ function Login(props) {
                     <Button
                       style={{ float: "right", width: 120 }}
                       color="primary"
+                      disabled={loading}
                       onClick={() => {
                         setLoading(true);
-                        login(data.identifier, data.password)
+                        registerUser(data.username, data.email, data.password)
                           .then((res) => {
-                            setLoading(false);
-                            // set authed User in global context to update header/app state
+                            // set authed user in global context object
                             appContext.setUser(res.data.user);
-                            alert("You are now logged in as "&res.data.user)
-                            // console.log("context?");
-                            // setUser(res.data.user);
-                            // appContext.user=res.data.user;
-                            // appContext.isAuthenticated=true;
-                            // console.log("context:", appContext);
+                            setLoading(false);
+                            console.log(`registered user: ${JSON.stringify(res.data)}`)
                           })
                           .catch((error) => {
+                            console.log(`error in register: ${error}`)
                             //setError(error.response.data);
                             setLoading(false);
                           });
                       }}
                     >
-                      {loading ? "Loading... " : "Submit"}
+                      {loading ? "Loading.." : "Submit"}
                     </Button>
                   </FormGroup>
                 </fieldset>
@@ -151,6 +152,5 @@ function Login(props) {
       </style>
     </Container>
   );
-}
-
-export default Login;
+};
+export default Register;
